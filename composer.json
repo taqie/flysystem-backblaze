@@ -19,9 +19,15 @@
             "role": "Developer"
         }
     ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:taqie/backblaze-b2.git"
+        }
+    ],
     "require": {
         "php": "^8.2",
-        "gliterd/backblaze-b2": ">=1.5.0",
+        "taqie/backblaze-b2": "dev-master",
         "league/flysystem": "^3.0",
         "mikey179/vfsstream": "*",
         "psr/http-message-implementation": "*"
