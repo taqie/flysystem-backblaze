@@ -3,6 +3,7 @@
 namespace Taqie\Flysystem;
 
 use BackblazeB2\Client;
+use BackblazeB2\Exceptions\NotFoundException;
 use GuzzleHttp\Psr7;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
@@ -38,8 +39,6 @@ class BackblazeAdapter implements FilesystemAdapter
             'FileName'   => $path,
             'Body'       => $resource,
         ]);
-
-//        return $this->getFileInfo($file);
     }
 
     /**
@@ -140,7 +139,11 @@ class BackblazeAdapter implements FilesystemAdapter
      */
     public function delete(string $path): void
     {
-        $this->getClient()->deleteFile(['FileName' => $path, 'BucketId' => $this->bucketId, 'BucketName' => $this->bucketName]);
+        try {
+            $this->getClient()->deleteFile(['FileName' => $path, 'BucketId' => $this->bucketId, 'BucketName' => $this->bucketName]);
+        }catch (NotFoundException $notFoundException) {
+
+        }
     }
 
     /**
