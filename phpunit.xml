@@ -1,29 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         bootstrap="./phpunit.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         syntaxCheck="true"
-         verbose="true"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.2/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects"
 >
     <testsuites>
-        <testsuite name="flysystem/tests">
-            <directory suffix=".php">./tests/</directory>
+        <testsuite name="default">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">./src/</directory>
-        </whitelist>
-    </filter>
+
+    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+<!--    <logging>-->
+<!--        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>-->
+<!--        <log type="coverage-html" target="coverage" showUncoveredFiles="true"/>-->
+<!--        <log type="coverage-clover" target="coverage.xml" showUncoveredFiles="true"/>-->
+<!--    </logging>-->
+    <coverage>
+        <report>
+<!--            <text outputFile="coverage.txt" showOnlySummary="true" showUncoveredFiles="true"/>-->
+            <cobertura outputFile="cobertura.xml"/>
+        </report>
+    </coverage>
     <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
-        <log type="coverage-html" target="coverage" showUncoveredFiles="true"/>
-        <log type="coverage-clover" target="coverage.xml" showUncoveredFiles="true"/>
+        <junit outputFile="junit.xml"/>
     </logging>
 </phpunit>
+
+
+        <!--<?xml version="1.0" encoding="UTF-8"?>-->
+        <!--<phpunit backupGlobals="false"-->
+        <!--         backupStaticAttributes="false"-->
+        <!--         bootstrap="./phpunit.php"-->
+        <!--         colors="true"-->
+        <!--         convertErrorsToExceptions="true"-->
+        <!--         convertNoticesToExceptions="true"-->
+        <!--         convertWarningsToExceptions="true"-->
+        <!--         processIsolation="false"-->
+        <!--         stopOnFailure="false"-->
+        <!--         syntaxCheck="true"-->
+        <!--         verbose="true"-->
+        <!--&gt;-->
+        <!--    <testsuites>-->
+        <!--        <testsuite name="flysystem/tests">-->
+        <!--            <directory suffix=".php">./tests/</directory>-->
+        <!--        </testsuite>-->
+        <!--    </testsuites>-->
+        <!--    <filter>-->
+        <!--        <whitelist>-->
+        <!--            <directory suffix=".php">./src/</directory>-->
+        <!--        </whitelist>-->
+        <!--    </filter>-->
+        <!--    <logging>-->
+        <!--        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>-->
+        <!--        <log type="coverage-html" target="coverage" showUncoveredFiles="true"/>-->
+        <!--        <log type="coverage-clover" target="coverage.xml" showUncoveredFiles="true"/>-->
+        <!--    </logging>-->
+        <!--</phpunit>-->

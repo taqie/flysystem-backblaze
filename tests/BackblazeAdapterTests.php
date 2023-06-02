@@ -1,10 +1,20 @@
 <?php
 
-use BackblazeB2\File;
-use League\Flysystem\Config;
-use Mhetreramesh\Flysystem\BackblazeAdapter as Backblaze;
+namespace Taqie\Flysystem\Tests;
 
-class BackblazeAdapterTests extends PHPUnit_Framework_TestCase
+use BackblazeB2\Client;
+use BackblazeB2\File;
+use InvalidArgumentException;
+use League\Flysystem\Config;
+use League\Flysystem\FilesystemAdapter;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Mockery\MockInterface;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamFile;
+use Taqie\Flysystem\BackblazeAdapter;
+
+class BackblazeAdapterTests extends MockeryTestCase
 {
     /**
      * @var vfsStreamDirectory
@@ -18,40 +28,41 @@ class BackblazeAdapterTests extends PHPUnit_Framework_TestCase
 
     private function fileSetUp()
     {
-        $this->fs_mock = \org\bovigo\vfs\vfsStream::setup();
-        $this->file_mock = new \org\bovigo\vfs\vfsStreamFile('filename.ext');
+        $this->fs_mock = vfsStream::setup();
+        $this->file_mock = new vfsStreamFile('filename.ext');
         $this->fs_mock->addChild($this->file_mock);
     }
 
-    public function backblazeProvider()
+    public static function backblazeProvider(): array
     {
-        $mock = $this->prophesize('BackblazeB2\Client');
+        $mock = Mockery::mock(Client::class);
 
         return [
-            [new Backblaze($mock->reveal(), 'my_bucket'), $mock],
+            [new BackblazeAdapter($mock, 'my_bucket'), $mock],
         ];
     }
 
     /**
      * @dataProvider  backblazeProvider
      */
-    public function testHas($adapter, $mock)
+    public function testFileExists(FilesystemAdapter $adapter, MockInterface $mock): void
     {
-        $mock->fileExists(['BucketId' => null, 'BucketName' => 'my_bucket', 'FileName' => 'something'])->willReturn(true);
-        $result = $adapter->has('something');
+        $mock->shouldReceive("fileExists")->with(['BucketId' => null, 'BucketName' => 'my_bucket', 'FileName' => 'something'])->andReturnTrue();
+        $result = $adapter->fileExists('something');
         $this->assertTrue($result);
     }
 
     /**
      * @dataProvider  backblazeProvider
      */
-    public function testWrite($adapter, $mock)
+    public function testWrite(FilesystemAdapter $adapter, MockInterface $mock): void
     {
-        $mock->upload(['BucketId' => null, 'BucketName' => 'my_bucket', 'FileName' => 'something', 'Body' => 'contents'])->willReturn(new File('something', '', '', '', ''), false);
-        $result = $adapter->write('something', 'contents', new Config());
-        $this->assertInternalType('array', $result);
-        $this->assertArrayHasKey('type', $result);
-        $this->assertEquals('file', $result['type']);
+        $mock->shouldReceive("upload")
+            ->once()
+            ->with(['BucketId' => null, 'BucketName' => 'my_bucket', 'FileName' => 'something', 'Body' => 'contents'])
+            ->andReturn(new File('something', '', '', '', ''));
+
+        $adapter->write('something', 'contents', new Config());
     }
 
     /**
@@ -188,7 +199,7 @@ class BackblazeAdapterTests extends PHPUnit_Framework_TestCase
         $result3 = $adapter->listContents('some_folder', true);
         $this->assertEquals([$normalized_files[1], $normalized_files[2]], $result3);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $adapter->listContents(false, false);
         $adapter->listContents(false, 'haha');
         $adapter->listContents('', 'haha');

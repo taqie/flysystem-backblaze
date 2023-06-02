@@ -1,9 +1,9 @@
 {
-    "name": "mhetreramesh/flysystem-backblaze",
+    "name": "taqie/flysystem-backblaze",
     "type": "library",
     "description": "Backblaze adapter for the flysystem filesystem abstraction library",
     "keywords": ["flysystem", "filesystem", "api", "backblaze", "client"],
-    "homepage": "https://github.com/mhetreramesh/flysystem-backblaze",
+    "homepage": "https://github.com/taqie/flysystem-backblaze",
     "license": "MIT",
     "authors": [
         {
@@ -11,28 +11,35 @@
             "email": "mhetreramesh@gmail.com",
             "homepage": "https://about.me/rameshmhetre",
             "role": "Developer"
+        },
+        {
+            "name": "Gracjan Kubicki",
+            "email": "graca.kubicki@gmail.com",
+            "homepage": "https://anime-centrum.pl",
+            "role": "Developer"
         }
     ],
     "require": {
-        "php": "^7.2",
-        "league/flysystem": "~1.0",
+        "php": "^8.2",
         "gliterd/backblaze-b2": ">=1.5.0",
-        "psr/http-message-implementation": "*",
-        "mikey179/vfsstream": "*"
+        "league/flysystem": "^3.0",
+        "mikey179/vfsstream": "*",
+        "psr/http-message-implementation": "*"
     },
     "require-dev": {
-        "phpunit/phpunit" : "~4.0||~5.0",
-        "scrutinizer/ocular": "~1.1",
-        "squizlabs/php_codesniffer": "~2.3"
+        "mockery/mockery": "^1.5",
+        "phpunit/phpunit": "^10",
+        "symfony/var-dumper": "^6.3"
+
     },
     "autoload": {
         "psr-4": {
-            "Mhetreramesh\\Flysystem\\": "src"
+            "Taqie\\Flysystem\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Mhetreramesh\\Flysystem\\Tests\\": "tests"
+            "Taqie\\Flysystem\\Tests\\": "tests"
         }
     },
     "scripts": {

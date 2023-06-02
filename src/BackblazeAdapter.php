@@ -1,57 +1,36 @@
 <?php
 
-namespace Mhetreramesh\Flysystem;
+namespace Taqie\Flysystem;
 
 use BackblazeB2\Client;
 use GuzzleHttp\Psr7;
-use League\Flysystem\Adapter\AbstractAdapter;
-use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
 use League\Flysystem\Config;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemAdapter;
 
-class BackblazeAdapter extends AbstractAdapter
+class BackblazeAdapter implements FilesystemAdapter
 {
-    use NotSupportingVisibilityTrait;
-
-    protected $client;
-
-    protected $bucketName;
-
-    protected $bucketId;
-
-    public function __construct(Client $client, $bucketName, $bucketId = null)
+    public function __construct(protected Client $client, protected string $bucketName, protected string|null $bucketId = null)
     {
-        $this->client = $client;
-        $this->bucketName = $bucketName;
-        $this->bucketId = $bucketId;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function has($path)
+    public function write(string $path, string $contents, Config $config): void
     {
-        return $this->getClient()->fileExists(['FileName' => $path, 'BucketId' => $this->bucketId, 'BucketName' => $this->bucketName]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($path, $contents, Config $config)
-    {
-        $file = $this->getClient()->upload([
+        $this->getClient()->upload([
             'BucketId'   => $this->bucketId,
             'BucketName' => $this->bucketName,
             'FileName'   => $path,
             'Body'       => $contents,
         ]);
-
-        return $this->getFileInfo($file);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function writeStream($path, $resource, Config $config)
+    public function writeStream(string $path, $contents, Config $config): void
     {
         $file = $this->getClient()->upload([
             'BucketId'   => $this->bucketId,
@@ -60,7 +39,7 @@ class BackblazeAdapter extends AbstractAdapter
             'Body'       => $resource,
         ]);
 
-        return $this->getFileInfo($file);
+//        return $this->getFileInfo($file);
     }
 
     /**
@@ -96,7 +75,7 @@ class BackblazeAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function read($path)
+    public function read(string $path): string
     {
         $file = $this->getClient()->getFile([
             'BucketId'   => $this->bucketId,
@@ -144,22 +123,24 @@ class BackblazeAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function copy($path, $newPath)
+    public function copy(string $source, string $destination, Config $config): void
     {
-        return $this->getClient()->upload([
+        $this->getClient()->upload([
             'BucketId'   => $this->bucketId,
             'BucketName' => $this->bucketName,
             'FileName'   => $newPath,
             'Body'       => @file_get_contents($path),
         ]);
+
+
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete($path)
+    public function delete(string $path): void
     {
-        return $this->getClient()->deleteFile(['FileName' => $path, 'BucketId' => $this->bucketId, 'BucketName' => $this->bucketName]);
+        $this->getClient()->deleteFile(['FileName' => $path, 'BucketId' => $this->bucketId, 'BucketName' => $this->bucketName]);
     }
 
     /**
@@ -230,7 +211,7 @@ class BackblazeAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function listContents($directory = '', $recursive = false)
+    public function listContents(string $path, bool $deep): iterable
     {
         $fileObjects = $this->getClient()->listFiles([
             'BucketId'   => $this->bucketId,
@@ -274,5 +255,55 @@ class BackblazeAdapter extends AbstractAdapter
         ];
 
         return $normalized;
+    }
+
+    public function fileExists(string $path): bool
+    {
+        return $this->getClient()->fileExists(['FileName' => $path, 'BucketId' => $this->bucketId, 'BucketName' => $this->bucketName]);
+    }
+
+    public function directoryExists(string $path): bool
+    {
+        // TODO: Implement directoryExists() method.
+    }
+
+    public function deleteDirectory(string $path): void
+    {
+        // TODO: Implement deleteDirectory() method.
+    }
+
+    public function createDirectory(string $path, Config $config): void
+    {
+        // TODO: Implement createDirectory() method.
+    }
+
+    public function setVisibility(string $path, string $visibility): void
+    {
+        // TODO: Implement setVisibility() method.
+    }
+
+    public function visibility(string $path): FileAttributes
+    {
+        // TODO: Implement visibility() method.
+    }
+
+    public function mimeType(string $path): FileAttributes
+    {
+        // TODO: Implement mimeType() method.
+    }
+
+    public function lastModified(string $path): FileAttributes
+    {
+        // TODO: Implement lastModified() method.
+    }
+
+    public function fileSize(string $path): FileAttributes
+    {
+        // TODO: Implement fileSize() method.
+    }
+
+    public function move(string $source, string $destination, Config $config): void
+    {
+        // TODO: Implement move() method.
     }
 }
